@@ -4,15 +4,11 @@ import subprocess
 import optparse
 import re
 
-
 def get_arguments():
     parser = optparse.OptionParser()
     parser.add_option("-i", "--interface", dest="interface", help="Interface to change its MAC address")
     parser.add_option("-m", "--mac", dest="mac", help="New MAC address")
-    parser.add_option("-p", "--reset", dest="reset", help="Reset MAC address to original")
     (options, arguments) = parser.parse_args()
-    if options.reset:
-        return options()
     if not options.interface:
         parser.error("[-] Please specify an interface")
     elif not options.mac:
@@ -24,13 +20,6 @@ def change_mac(interface, mac):
 
     subprocess.call(["ifconfig", interface, "down"])
     subprocess.call(["ifconfig", interface, "hw", "ether", mac])
-    subprocess.call(["ifconfig", interface, "up"])
-
-def reset_mac_to_org(interface, reset):
-    print("[+] Reset MAC address for " + interface)
-
-    subprocess.call(["ifconfig", interface, "down"])
-    subprocess.call(["macchanger",reset, interface])
     subprocess.call(["ifconfig", interface, "up"])
 
 def get_current_mac(interface):
@@ -50,6 +39,5 @@ change_mac(options.interface, options.mac)
 current_mac = get_current_mac(options.interface)
 if current_mac == options.mac:
     print("[+] MAC address was succesfully changed to " + current_mac)
-
 else:
     print("[-] MAC address did not get changed.")
